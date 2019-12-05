@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>TV</title>
+    <link rel="stylesheet" href="video-js.min.css">
+    <style>
+        *{margin: 0;padding: 0;}
+        html,body,.main,.vjs{width:100%;height:100%;}
+        .tvlist {
+        	position: fixed;
+        	height: 100%;
+        	width: 200px;
+        	right: -200px;
+        	top: 0;
+        	padding-left: 20px;
+        	transition: all .2s;
+        	opacity: .5;
+        	overflow: auto;
+        }
+        .tvlist:hover {
+        	right: 0;
+        	opacity: 1;
+        }
+        .tvlist li{
+			height: 30px;
+			line-height: 30px;
+			padding-left: 30px;
+			cursor: pointer;
+			transition: all .2s;
+			font-size: 16px;
+			background: rgba(255,255,255,.6);
+			list-style: none;
+        }
+        .tvlist li:hover,.tvlist li.active{
+        	background: rgba(255,255,255,.8);
+        	font-size: 18px;
+        }
+        ::-webkit-scrollbar {
+          /*滚动条整体样式*/
+          width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+          height: 1px;
+          }
+          ::-webkit-scrollbar-thumb {
+          /*滚动条里面小方块*/
+          border-radius: 10px;
+          box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+          background   : #535353;
+          }
+          ::-webkit-scrollbar-track {
+          /*滚动条里面轨道*/
+          box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+          border-radius: 10px;
+          background   : #ededed;
+          }
+         .vjs-error-display{pointer-events: none;}
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <video-js id="vid1" class="vjs-default-skin vjs" controls>
+            <source src="https://example.com/index.m3u8" type="application/x-mpegURL">
+        </video-js>
+    </div>
+    <ul id="tvlist" class="tvlist"></ul>
+    <script src="data.js"></script>
+    <script src="video.min.js"></script>
+    <script src="videojs-http-streaming.min.js"></script>
+    <script>
+    
+	init();
+
+	function init() {
+		window.tvlist = document.getElementById('tvlist');
+		window.player = videojs('vid1', {
+		    autoplay: true
+		});
+	    renderList();
+	    bind();
+		changeSrc(list[0][1]);
+	}
+
+
+    function bind() {
+        tvlist.onclick = function(event) {
+            var e = event || window.event;
+            var t = e.target;
+            if (t.nodeName.toLowerCase() == 'li') {
+                changeSrc(t.getAttribute('data-src'));
+                var active = document.querySelector('.active');
+                active && active.classList.remove('active');
+                t.classList.add('active');
+                document.title = t.innerHTML;
+            }
+        }
+    }
+
+    function changeSrc(name) {
+        player.src({
+            src: 'http://ivi.bupt.edu.cn/hls/' + name + '.m3u8',
+            type: 'application/x-mpegURL',
+        });
+        player.play();
+    }
+
+
+    function renderList() {
+        var arr = [];
+        for (var i = 0; i < list.length; i++) {
+            arr.push('<li data-src="' + list[i][1] + '">' + list[i][0] + '</li>')
+        }
+        tvlist.innerHTML = arr.join('');
+    }
+    </script>
+</body>
+
+</html>
